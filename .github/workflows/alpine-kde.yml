@@ -31,14 +31,21 @@ jobs:
           apk add kde-applications
           poweroff
           EOF
-          mkinitramfs -o initrd.img startup.sh
+          # Create a temporary directory for the initrd contents
+          mkdir -p initrd_contents
+          # Copy required files and scripts to the initrd_contents directory
+          cp startup.sh initrd_contents/
+          cp -r other_required_files initrd_contents/
+          # Create the initrd using cpio
+          cd initrd_contents
+          find . | cpio -o -H newc | gzip > ../initrd.img
 
       - name: Run QEMU and install KDE Plasma
         run: |
           wget -q https://releases.linaro.org/components/kernel/uefi-linaro/latest/release/qemu64/QEMU_EFI.fd
           wget -q https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/aarch64/vmlinuz-lts
           qemu-system-aarch64 -m 2048 -cpu cortex-a57 -machine virt -bios QEMU_EFI.fd -kernel vmlinuz-lts -initrd initrd.img -drive if=none,id=rootfs,format=raw,file=alpine-rpi-3.21.0-aarch64.img -device virtio-blk-device,drive=rootfs -netdev user,id=eth0 -device virtio-net-device,netdev=eth0 -nographic -monitor stdio
-
+          
       - name: Create new image
         run: |
           dd if=alpine-rpi-3.21.0-aarch64.img of=alpine-rpi-3.21.0-aarch64-kde.img bs=1M conv=notrunc
