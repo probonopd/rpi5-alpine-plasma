@@ -45,7 +45,7 @@ jobs:
           gzip alpine-rpi-3.21.0-aarch64-kde.img
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: alpine-rpi-3.21.0-aarch64-kde.img.gz
           path: alpine-rpi-3.21.0-aarch64-kde.img.gz
