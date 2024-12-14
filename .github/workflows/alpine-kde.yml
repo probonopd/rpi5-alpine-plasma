@@ -34,7 +34,7 @@ jobs:
 
       - name: Run QEMU and install KDE Plasma
         run: |
-          qemu-system-aarch64 -m 2048 -cpu cortex-a57 -machine virt -bios QEMU_EFI.fd -drive if=none,id=rootfs,format=raw,file=alpine-rpi-3.21.0-aarch64.img -device virtio-blk-device,drive=rootfs -append "rootwait root=/dev/vda" -netdev user,id=eth0 -device virtio-net-device,netdev=eth0 -nographic -monitor stdio -serial stdio < startup.sh
+          qemu-system-aarch64 -m 2048 -cpu cortex-a57 -machine virt -bios QEMU_EFI.fd -drive if=none,id=rootfs,format=raw,file=alpine-rpi-3.21.0-aarch64.img -device virtio-blk-device,drive=rootfs -netdev user,id=eth0 -device virtio-net-device,netdev=eth0 -nographic -monitor stdio -serial stdio < startup.sh
 
       - name: Create new image
         run: |
