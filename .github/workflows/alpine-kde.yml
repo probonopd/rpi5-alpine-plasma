@@ -31,11 +31,12 @@ jobs:
           apk add kde-applications
           poweroff
           EOF
+          mkinitramfs -o initrd.img startup.sh
 
       - name: Run QEMU and install KDE Plasma
         run: |
           wget https://releases.linaro.org/components/kernel/uefi-linaro/latest/release/qemu64/QEMU_EFI.fd
-          qemu-system-aarch64 -m 2048 -cpu cortex-a57 -machine virt -bios QEMU_EFI.fd -drive if=none,id=rootfs,format=raw,file=alpine-rpi-3.21.0-aarch64.img -device virtio-blk-device,drive=rootfs -netdev user,id=eth0 -device virtio-net-device,netdev=eth0 -nographic -monitor stdio -serial null < startup.sh
+          qemu-system-aarch64 -m 2048 -cpu cortex-a57 -machine virt -bios QEMU_EFI.fd -drive if=none,id=rootfs,format=raw,file=alpine-rpi-3.21.0-aarch64.img -device virtio-blk-device,drive=rootfs -netdev user,id=eth0 -device virtio-net-device,netdev=eth0 -nographic -monitor stdio -initrd initrd.img
 
       - name: Create new image
         run: |
