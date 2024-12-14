@@ -43,8 +43,9 @@ jobs:
         run: |
           wget -q https://releases.linaro.org/components/kernel/uefi-linaro/latest/release/qemu64/QEMU_EFI.fd
           wget -q https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/aarch64/vmlinuz-lts
-          qemu-system-aarch64 -m 2048 -cpu cortex-a57 -machine virt -bios QEMU_EFI.fd -kernel vmlinuz-lts -initrd initrd.img -drive if=none,id=rootfs,format=raw,file=alpine-rpi-3.21.0-aarch64.img -device virtio-blk-device,drive=rootfs -netdev user,id=eth0 -device virtio-net-device,netdev=eth0 -nographic -monitor stdio -serial stdio
-          
+          qemu-system-aarch64 -m 2048 -cpu cortex-a57 -machine virt -bios QEMU_EFI.fd -kernel vmlinuz-lts -initrd initrd.img -drive if=none,id=rootfs,format=raw,file=alpine-rpi-3.21.0-aarch64.img -device virtio-blk-device,drive=rootfs -netdev user,id=eth0 -device virtio-net-device,netdev=eth0 -nographic -monitor stdio -serial stdio -d all
+          ls *
+
       - name: Create new image
         run: |
           dd if=alpine-rpi-3.21.0-aarch64.img of=alpine-rpi-3.21.0-aarch64-kde.img bs=1M conv=notrunc
