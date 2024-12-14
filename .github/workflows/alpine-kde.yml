@@ -1,0 +1,51 @@
+name: Build Alpine Linux with KDE Plasma
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-system-aarch64
+
+      - name: Download Alpine Linux image
+        run: |
+          wget https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/aarch64/alpine-rpi-3.21.0-aarch64.img.gz
+          gunzip alpine-rpi-3.21.0-aarch64.img.gz
+
+      - name: Create custom QEMU startup script
+        run: |
+          cat > startup.sh <<EOF
+          #!/bin/sh
+          apk update
+          apk add kde-plasma
+          apk add kde-applications
+          poweroff
+          EOF
+
+      - name: Run QEMU and install KDE Plasma
+        run: |
+          qemu-system-aarch64 -m 2048 -cpu cortex-a57 -machine virt -bios QEMU_EFI.fd -drive if=none,id=rootfs,format=raw,file=alpine-rpi-3.21.0-aarch64.img -device virtio-blk-device,drive=rootfs -append "rootwait root=/dev/vda" -netdev user,id=eth0 -device virtio-net-device,netdev=eth0 -nographic -monitor stdio -serial stdio < startup.sh
+
+      - name: Create new image
+        run: |
+          dd if=alpine-rpi-3.21.0-aarch64.img of=alpine-rpi-3.21.0-aarch64-kde.img bs=1M conv=notrunc
+
+      - name: Compress new image
+        run: |
+          gzip alpine-rpi-3.21.0-aarch64-kde.img
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: alpine-rpi-3.21.0-aarch64-kde.img.gz
+          path: alpine-rpi-3.21.0-aarch64-kde.img.gz
